@@ -1,0 +1,83 @@
+stages:
+    - clone_db
+    - schema_change
+
+# Create a Delphix VDB clone and SelfService "container" from Master Database,
+# associated to git branch (if the VDB for this branch doesn't already exist).
+# The generated VDB name will be 'echo v${CI_COMMIT_REF_SLUG:0:6}| sed 's/-/_/g')'
+# Create bookmarks for CI_COMMIT_BEFORE_SHA and CI_COMMIT_SHA.
+# Running this step again manually (re-deploy or rollback change on Gitlab's Environment page)
+# will trigger a rollback in Delphix to bookmark CI_COMMIT_SHA (if CI_ROLLBACK=true).
+clone_databases:
+    image: dstolf/dxgitlabci:latest
+    stage: clone_db
+    only:
+      - branches
+      - tag
+    except:
+      - master
+    environment:
+      name: QA/$CI_BUILD_REF_NAME
+      on_stop: stop_databases
+    script:
+      - cd /app/bin
+      - /app/bin/gitlab_ci_cd_controller.sh
+
+# Run your scripts
+# You can retrieve the host information from Delphix or save it as a CI/CD environment variable in Gitlab
+# The database name is composed by the first 6 letters of the branch or tag name, preceded by the letter 'v' and replacing all '-' by '_')
+# DB_NAME=$(echo v${CI_COMMIT_REF_SLUG:0:6}| sed 's/-/_/g'))
+exec_scripts:
+    image: oracle-instant-client:latest # just an example, use whatever image you have built to run your schema changes
+    stage: schema_change
+    only:
+      - branches
+      - tag
+    except:
+      - master
+    environment:
+      name: QA/$CI_BUILD_REF_NAME
+    script:
+    - your schema change logic here
+    - run migrations, exec scripts, handle errors etc etc
+    - when working on a VDB, don't worry about rolling back changes, just return error and 'rollback_databases' will do the rest
+
+# If there was any error on exec_scripts and CI_ROLLBACK env variable is enabled,
+# this step will trigger Delphix to restore the latest save point ($CI_COMMIT_SHA)
+# notice that whis step of the stage `schema_change` will be run only if `exec_scripts` step returns error
+rollback_databases:
+    image: dstolf/dxgitlabci:latest
+    stage: schema_change
+    only:
+      - branches
+      - tag
+    except:
+      - master
+    environment:
+      name: QA/$CI_BUILD_REF_NAME
+    when: on_failure
+    script:
+      - cd /app/bin
+      - /app/bin/gitlab_ci_cd_controller.sh
+
+
+# Disable Delphix SelfService Container
+# manual step to teardown the dynamic environment (ex. when a branch is deleted)
+stop_databases:
+  image: dstolf/dxgitlabci:latest
+  stage: clone_db
+  variables:
+    GIT_STRATEGY: fetch
+  when: manual
+  only:
+    - branches
+    - tags
+  except:
+    - master
+  environment:
+    name: QA/$CI_BUILD_REF_NAME
+    action: stop
+  script:
+    - cd /app/bin/
+    - dx_ctl_js_container -action disable -container_name $CI_COMMIT_REF_SLUG
+
