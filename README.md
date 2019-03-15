@@ -24,8 +24,9 @@ Or you can just pull it from Docker Hub:
 Every configuration should be passed as environment variables. Some of them are provided by [Gitlab CI/CD itself](https://docs.gitlab.com/ee/ci/variables/#predefined-environment-variables) but there are a few others that you'll need to set in your `Project Settings -> CI/CD -> Variables`. 
 
 You can check all the variables in the table below:
+
 |Variable Name               | Provided by Gitlab CI/CD | Description                                                                                        |
-|----------------------------|:------------------------:|:--------------------------------------------------------------------------------------------------:|
+| ---------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------- |
 |CI_COMMIT_REF_SLUG          |yes                       | Gitlab's branch or tag name for which project is built                                             |
 |CI_COMMIT_SHA               |yes                       | Gitlab's commit revision for which project is built                                                |
 |CI_COMMIT_BEFORE_SHA        |yes                       | Gitlab's previous latest commit present on a branch before a push request                          |
@@ -37,7 +38,7 @@ You can check all the variables in the table below:
 |DELPHIX_PASSWORD            |No                        | Delphix Engine Password                                                                            |
 |DELPHIX_TARGET_ENVIRONMENT  |No                        | The name of the environment(host) where the DB will be provisioned                                 |
 |DELPHIX_DB_TYPE             |No                        | Database Type                                                                                      |
-|DELPHIX_ENV_INST            |No                        | The name of the isntance where the DB will be provisioned                                          |
+|DELPHIX_ENV_INST            |No                        | The name of the instance where the DB will be provisioned                                          |
 |DELPHIX_CONTAINER_OWNER     |No                        | Default Delphix Container Owner in SelfService (JS)                                                |
 
 Check [dxtoolkit docs](https://github.com/delphix/dxtoolkit/wiki) and [Gitlab's pre-defined environment variables](https://docs.gitlab.com/ee/ci/variables/#predefined-environment-variables) for further information on each one.
