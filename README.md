@@ -46,7 +46,7 @@ Check [dxtoolkit docs](https://github.com/delphix/dxtoolkit/wiki) and [Gitlab's 
 
 # Pre-reqs
 
-- Add your dSource to Delphix first (otherwise we'll nothing to clone);
+- Add your dSource to Delphix first (otherwise we'll have nothing to clone);
 - It's advisable to set the DELPHIX_DSOURCE repo environment variable, otherwise we'll just pick the first dSource that containts APP_PREFIX on its name;
 - A VDB Group named `${APP_PREFIX}-VDBS` should be previously created in Delphix.
 
