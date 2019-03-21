@@ -25,23 +25,53 @@ Every configuration should be passed as environment variables. Some of them are 
 
 You can check all the variables in the table below:
 
-|Variable Name               | Provided by Gitlab CI/CD | Description                                                                                        |
-| ---------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------- |
-|CI_COMMIT_REF_SLUG          |yes                       | Gitlab's branch or tag name for which project is built                                             |
-|CI_COMMIT_SHA               |yes                       | Gitlab's commit revision for which project is built                                                |
-|CI_COMMIT_BEFORE_SHA        |yes                       | Gitlab's previous latest commit present on a branch before a push request                          |
-|CI_ROLLBACK                 |No                        | Set to `true` to enable rollbacks on re-deploys                                                    |
-|APP_PREFIX                  |No                        | A short app identifier we can use to reference DB Groups and Containers in Delphix                 |
-|DELPHIX_NAME                |No                        | Delphix Engine Name                                                                                |
-|DELPHIX_ADDRESS             |No                        | Delphix Engine Address                                                                             |
-|DELPHIX_USER                |No                        | Delphix Engine User                                                                                |
-|DELPHIX_PASSWORD            |No                        | Delphix Engine Password                                                                            |
-|DELPHIX_TARGET_ENVIRONMENT  |No                        | The name of the environment(host) where the DB will be provisioned                                 |
-|DELPHIX_DB_TYPE             |No                        | Database Type                                                                                      |
-|DELPHIX_ENV_INST            |No                        | The name of the instance where the DB will be provisioned                                          |
-|DELPHIX_CONTAINER_OWNER     |No                        | Default Delphix Container Owner in SelfService (JS)                                                |
+|Variable Name               | Provided by Gitlab CI/CD | Description                                                                                           |
+| ---------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------- |
+|CI_COMMIT_REF_SLUG          |yes                       | Gitlab's branch or tag name for which project is built                                                |
+|CI_COMMIT_SHA               |yes                       | Gitlab's commit revision for which project is built                                                   |
+|CI_COMMIT_BEFORE_SHA        |yes                       | Gitlab's previous latest commit present on a branch before a push request                             |
+|CI_ROLLBACK                 |No                        | Set to `true` to enable rollbacks on re-deploys                                                       |
+|APP_PREFIX                  |No                        | A short app identifier we can use to reference DB Groups and Containers in Delphix                    |
+|DELPHIX_NAME                |No                        | Delphix Engine Name                                                                                   |
+|DELPHIX_ADDRESS             |No                        | Delphix Engine Address                                                                                |
+|DELPHIX_USER                |No                        | Delphix Engine User                                                                                   |
+|DELPHIX_PASSWORD            |No                        | Delphix Engine Password                                                                               |
+|DELPHIX_TARGET_ENVIRONMENT  |No                        | The name of the environment(host) where the DB will be provisioned                                    |
+|DELPHIX_DB_TYPE             |No                        | Database Type                                                                                         |
+|DELPHIX_ENV_INST            |No                        | The name of the instance where the DB will be provisioned                                             |
+|DELPHIX_CONTAINER_OWNER     |No                        | Default Delphix Container Owner in SelfService (JS)                                                   |
+|DELPHIX_DSOURCE             |No                        | If provided, will be used as dSource, otherwise will search for any dSource that containts APP_PREFIX |
 
 Check [dxtoolkit docs](https://github.com/delphix/dxtoolkit/wiki) and [Gitlab's pre-defined environment variables](https://docs.gitlab.com/ee/ci/variables/#predefined-environment-variables) for further information on each one.
+
+# Pre-reqs
+
+- Add your dSource to Delphix first (otherwise we'll nothing to clone);
+- It's advisable to set the DELPHIX_DSOURCE repo environment variable, otherwise we'll just pick the first dSource that containts APP_PREFIX on its name;
+- A VDB Group named `${APP_PREFIX}-VDBS` should be previously created in Delphix.
+
+# Screens
+
+Create a new branch:
+![Create New Branch on Gitlab](./pictures/new-branch.png)
+
+That will trigger the pipeline defined in `.gitlab-ci.yml`:
+![Pipeline for New Branch](./pictures/sample-pipeline.png)
+
+The pipeline step `clone_databases` will trigger the VDB creation:
+![VDB and Delphix Container Creation](./pictures/creating-vdb.png)
+
+New VDB:
+![Delphix VDB View](./pictures/delphix-vdb-view.png)
+
+And also a Delphix Self Service container, which will give you a nice view similar to a Git Graph:
+![Delphix SelfService View](./pictures/delphix-selfservice-view.png)
+
+After everything is done, you can manage the whole environment on Gitlab:
+![Gitlab Environment View](./pictures/gitlab-environments-view.png)
+
+And triggering a rollback will retore your database to a bookmark linked to the commit hash:
+![Gitlab Rollback Environment](./pictures/gitlab-environments-rollback.png)
 
 # Example .gitlab-ci.yml
 
