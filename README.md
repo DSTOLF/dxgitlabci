@@ -70,7 +70,7 @@ And also a Delphix Self Service container, which will give you a nice view simil
 After everything is done, you can manage the whole environment on Gitlab:
 ![Gitlab Environment View](./pictures/gitlab-environments-view.png)
 
-And triggering a rollback will retore your database to a bookmark linked to the commit hash:
+And triggering a rollback will restore your database to a bookmark linked to the commit hash:
 ![Gitlab Rollback Environment](./pictures/gitlab-environments-rollback.png)
 
 # Example .gitlab-ci.yml
