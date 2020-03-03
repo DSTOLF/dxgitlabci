@@ -1,14 +1,10 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
-ARG DOWNLOAD_URL=https://github.com/delphix/dxtoolkit/releases/download/v2.3.9.1/dxtoolkit2-2.3.9.1-redhat7.tar.gz
+ARG VERSION="v2.4.5"
+ARG HTTP_PROXY=""
 
-RUN apt-get update && apt-get install -y wget curl \
-   && mkdir -p /app/bin \
-   && wget -O /app/bin/dxtools.tar.gz $DOWNLOAD_URL \
-   && tar -xzvf /app/bin/dxtools.tar.gz -C /app/bin --strip-components=1 \
-   && rm -f /app/bin/dxtools.tar.gz
-  
-COPY ./bin /app/bin
+RUN mkdir -p /app/bin && apt update && apt install -y curl wget
+RUN wget -qO-  https://github.com/delphix/dxtoolkit/releases/download/${VERSION}/dxtoolkit2-${VERSION}-ubuntu1804-installer.tar.gz | tar -C /app --transform 's/^dxtoolkit2/bin/' -xvz
 
 ENV PATH=$PATH:/app/bin/
 
